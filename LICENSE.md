@@ -1,4 +1,5 @@
 DinGo chess engine
+
 Copyright (C) 2018  Sergei Belyakov
 
 This program is free software: you can redistribute it and/or modify
