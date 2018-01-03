@@ -2,8 +2,9 @@ package main
 
 import (
 	"bufio"
+	"fmt"
+	"io"
 	"os"
-	"strings"
 
 	"github.com/tasmanianfox/dingo/command"
 	"github.com/tasmanianfox/dingo/common"
@@ -11,10 +12,15 @@ import (
 )
 
 func main() {
+	var r io.Reader = os.Stdin
+	Run(r)
+}
+
+func Run(r io.Reader) {
 	var p protocol.Protocol = nil
-	reader := bufio.NewReader(os.Stdin)
-	input, _ := reader.ReadString('\n')
-	if "uci" == strings.TrimRight(input, "\n") {
+	s := bufio.NewScanner(r)
+	s.Scan()
+	if "uci" == s.Text() {
 		p = new(protocol.UciProtocol)
 	}
 	_, ok := p.(protocol.Protocol)
@@ -23,8 +29,10 @@ func main() {
 	}
 
 	var c command.Command = nil
-	for (c != nil) && (c.GetType() == common.СommandQuit) {
-		input, _ := reader.ReadString('\n')
-		input = strings.TrimRight(input, "\n")
+	for !((c != nil) && (c.GetType() == common.СommandQuit)) {
+		s.Scan()
+		input := s.Text()
+
+		fmt.Println("In: " + input)
 	}
 }
