@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/tasmanianfox/dingo/command"
+	"github.com/tasmanianfox/dingo/common"
 	"github.com/tasmanianfox/dingo/protocol"
-	"github.com/tasmanianfox/lynx/command"
-	"github.com/tasmanianfox/lynx/common"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 	}
 
 	var c command.Command = nil
-	for (c != nil) && (c.GetType() == common.CommandQuit) {
+	for (c != nil) && (c.GetType() == common.СommandQuit) {
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimRight(input, "\n")
 	}
