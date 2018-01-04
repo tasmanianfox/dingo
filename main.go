@@ -2,13 +2,14 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 
 	"github.com/tasmanianfox/dingo/command"
 	"github.com/tasmanianfox/dingo/common"
+	"github.com/tasmanianfox/dingo/engine"
 	"github.com/tasmanianfox/dingo/protocol"
+	"github.com/tasmanianfox/dingo/response"
 )
 
 func main() {
@@ -21,18 +22,21 @@ func Run(r io.Reader) {
 	s := bufio.NewScanner(r)
 	s.Scan()
 	if "uci" == s.Text() {
-		p = new(protocol.UciProtocol)
+		p = protocol.NewUciProtocol(s)
 	}
 	_, ok := p.(protocol.Protocol)
 	if !ok {
 		panic("Could not determine the protocol")
 	}
 
+	var e engine.Engine
 	var c command.Command = nil
-	for !((c != nil) && (c.GetType() == common.СommandQuit)) {
-		s.Scan()
-		input := s.Text()
-
-		fmt.Println("In: " + input)
+	var response response.Response = nil
+	for !((response != nil) && (common.ResponseQuit == response.GetType())) {
+		c = p.ReadCommand()
+		if nil == c {
+			continue
+		}
+		response = e.HandleCommand(c)
 	}
 }

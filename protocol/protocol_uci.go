@@ -2,20 +2,24 @@ package protocol
 
 import (
 	"bufio"
-	"os"
-	"strings"
 
 	"github.com/tasmanianfox/dingo/command"
 )
 
 type UciProtocol struct {
+	BufferedScanner *bufio.Scanner
 }
 
-func (UciProtocol) readCommand() command.Command {
-	reader := bufio.NewReader(os.Stdin)
-	input, _ := reader.ReadString('\n')
+func NewUciProtocol(s *bufio.Scanner) UciProtocol {
+	var p = UciProtocol{BufferedScanner: s}
+	return p
+}
+
+func (p UciProtocol) ReadCommand() command.Command {
 	var c command.Command
-	switch strings.TrimRight(input, "\n") {
+	p.BufferedScanner.Scan()
+	var i string = p.BufferedScanner.Text()
+	switch i {
 	case "isready":
 		c = new(command.CheckIfIsEngineReadyCommand)
 	case "quit":
