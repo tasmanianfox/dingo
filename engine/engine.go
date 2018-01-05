@@ -9,12 +9,17 @@ import (
 type Engine struct {
 }
 
-func (Engine) HandleCommand(c command.Command) response.Response {
+func (Engine) HandleCommand(c command.Command) (response.Response, bool) {
 	var r response.Response
+	var s bool = true
 	switch c.GetType() {
 	case common.СommandQuit:
 		r = new(response.QuitResponse)
+	case common.СommandCheckIfIsEngineReady:
+		r = new(response.ReadyResponse)
+	default:
+		s = false
 	}
 
-	return r
+	return r, s
 }

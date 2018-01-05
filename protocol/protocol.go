@@ -1,7 +1,11 @@
 package protocol
 
-import "github.com/tasmanianfox/dingo/command"
+import (
+	"github.com/tasmanianfox/dingo/command"
+	"github.com/tasmanianfox/dingo/response"
+)
 
 type Protocol interface {
-	ReadCommand() command.Command
+	ReadCommand() (command.Command, bool)
+	Output(response.Response)
 }
