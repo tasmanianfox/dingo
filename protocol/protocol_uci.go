@@ -15,6 +15,8 @@ type UciProtocol struct {
 
 func NewUciProtocol(s *bufio.Scanner, w *bufio.Writer) UciProtocol {
 	var p = UciProtocol{BufferedScanner: s, BufferedWriter: w}
+	p.Output(new(response.AppNameResponse))
+	p.Output(new(response.AuthorResponse))
 	return p
 }
 
@@ -42,6 +44,10 @@ func (p UciProtocol) Output(r response.Response) {
 	switch r.GetType() {
 	case common.ResponseReady:
 		s = "readyok"
+	case common.ResponseAppName:
+		s = "id name DinGo"
+	case common.ResponseAuthor:
+		s = "id author Sergei Belyakov"
 	default:
 		f = false
 	}
