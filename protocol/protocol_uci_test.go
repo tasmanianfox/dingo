@@ -3,6 +3,7 @@ package protocol
 import (
 	"bufio"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -14,7 +15,7 @@ import (
 func TestReadCommand(t *testing.T) {
 	var r io.Reader = strings.NewReader("isready\n")
 	var s = bufio.NewScanner(r)
-	var w = bufio.NewWriter(nil)
+	var w = bufio.NewWriter(os.Stdout)
 	var p = NewUciProtocol(s, w)
 
 	var c, success = p.ReadCommand()

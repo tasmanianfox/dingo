@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"io"
+	"os"
 	"strings"
 	"testing"
 )
 
 func TestRun(t *testing.T) {
 	var r io.Reader = strings.NewReader("uci\ntest\ntest123\nquit\n")
-	var w = bufio.NewWriter(nil)
+	var w = bufio.NewWriter(os.Stdout)
 	Run(r, w)
 
 	defer func() {
