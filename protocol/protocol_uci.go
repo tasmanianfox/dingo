@@ -68,38 +68,50 @@ func (p UciProtocol) Output(r response.Response) {
 	}
 }
 
-func (p UciProtocol) getSetPositionCommand(args []string) command.Command {
+func (p UciProtocol) getSetPositionCommand(args []string) command.SetPositionCommand {
 	var c command.SetPositionCommand
-	for i, arg := range args {
-		if "startpos" == arg {
-			c.NewGame = true
-		} else if 1 == i && "moves" == arg {
-			c.Mode = command.SetPositionModeMoves
-		} else {
-			var m = p.stringToMovement(arg)
-			c.AddMovement(m)
-		}
+	if len(args) >= 3 && "startpos" == args[0] && "moves" == args[1] {
+		c = p.getSetPositionCommandFromMovements(args[2:])
+	} else if 7 == len(args) && "fen" == args[0] {
+		c = p.getSetPositionCommandFromFEN(strings.Join(args[1:], " "))
 	}
 
 	return c
 }
+
+func (p UciProtocol) getSetPositionCommandFromFEN(s string) command.SetPositionCommand {
+	c := command.SetPositionCommand{NewGame: false, Mode: command.SetPositionModeDirect}
+	c.Position = board.FenToPosition(s)
+	return c
+}
+
+func (p UciProtocol) getSetPositionCommandFromMovements(movements []string) command.SetPositionCommand {
+	c := command.SetPositionCommand{NewGame: true, Mode: command.SetPositionModeMovements}
+	for _, ms := range movements {
+		var m = p.stringToMovement(ms)
+		c.AddMovement(m)
+	}
+	return c
+}
+
+// Replacements
 
 func (p UciProtocol) stringToMovement(s string) board.Movement {
 	if len(s) < 4 {
 		panic("Movement must be at least 4 characters long")
 	}
 	var m board.Movement
-	m.SourceVertical = p.charToVertical(s[0:1])
-	m.SourceHorizontal = p.charToHorizontal(s[1:2])
-	m.DestVertical = p.charToVertical(s[2:3])
-	m.DestHorizontal = p.charToHorizontal(s[3:4])
+	m.SourceColumn = p.charToColumn(s[0:1])
+	m.SourceRow = p.charToRow(s[1:2])
+	m.DestColumn = p.charToColumn(s[2:3])
+	m.DestRow = p.charToRow(s[3:4])
 	if 5 == len(s) {
-		m.CastTo = p.charToPieceToCast(s[4:5])
+		m.CastTo = p.charToPiece(s[4:5])
 	}
 	return m
 }
 
-func (p UciProtocol) charToHorizontal(c string) int {
+func (p UciProtocol) charToRow(c string) int {
 	var r int
 	switch c {
 	case "1":
@@ -119,12 +131,12 @@ func (p UciProtocol) charToHorizontal(c string) int {
 	case "8":
 		r = 7
 	default:
-		panic("Unsupported horizontal: " + c)
+		panic("Unsupported row: " + c)
 	}
 	return r
 }
 
-func (p UciProtocol) charToVertical(c string) int {
+func (p UciProtocol) charToColumn(c string) int {
 	var r int
 	switch c {
 	case "a":
@@ -144,22 +156,26 @@ func (p UciProtocol) charToVertical(c string) int {
 	case "h":
 		r = 7
 	default:
-		panic("Unsupported vertical: " + c)
+		panic("Unsupported column: " + c)
 	}
 	return r
 }
 
-func (p UciProtocol) charToPieceToCast(c string) int {
+func (p UciProtocol) charToPiece(c string) int {
 	var r int
 	switch c {
+	case "p":
+		r = common.PiecePawn
+	case "n":
+		r = common.PieceKnight
 	case "b":
 		r = common.PieceBishop
-	case "k":
-		r = common.PieceKnight
 	case "r":
 		r = common.PieceRook
 	case "q":
 		r = common.PieceQueen
+	case "k":
+		r = common.PieceKing
 	default:
 		panic("Unsupported piece to cast: " + c)
 	}

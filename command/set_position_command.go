@@ -6,14 +6,17 @@ import (
 )
 
 const (
-	SetPositionModeMoves = 0
-	SetPositionModeFen   = 1
+	// SetPositionModeMovements Reads movements from Movements property
+	SetPositionModeMovements = 0
+	// SetPositionModeDirect Assigns position directly from Position
+	SetPositionModeDirect = 1
 )
 
 type SetPositionCommand struct {
 	Movements []board.Movement
 	NewGame   bool
 	Mode      int
+	Position  board.Position
 }
 
 func (SetPositionCommand) GetType() int {
