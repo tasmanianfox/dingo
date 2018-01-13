@@ -8,8 +8,10 @@ type Position struct {
 	WhiteQueensideCastling bool
 	BlackKingsideCastling  bool
 	BlackQueensideCastling bool
-	EnPassantTargetRow     int
-	EnPassantTargetColumn  int
-	FiftyMoveClock         int
-	FullMoveClock          int
+	// -1 if no target
+	EnPassantTargetRow int
+	// -1 if no target
+	EnPassantTargetColumn int
+	FiftyMoveClock        int
+	FullMoveClock         int
 }

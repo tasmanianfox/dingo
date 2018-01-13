@@ -91,6 +91,76 @@ func FenToPosition(fen string) Position {
 	return pos
 }
 
+// PositionToFen converts an instance of Position struct to FEN string representation
+func PositionToFen(p Position) string {
+	f := ""
+	// Pieces
+	for i, r := range p.Board {
+		var e = 0 // num of empty cells
+		for _, pc := range r {
+			if common.ColourEmpty == pc.Colour && common.PieceEmpty == pc.Type {
+				e++
+			} else {
+				if e > 0 { // add the number of empty cells detected previously
+					f += strconv.Itoa(e)
+					e = 0
+				}
+				f += pieceToChar(pc)
+			}
+		}
+		if e > 0 { // add the number of empty cells at the end of row if exists
+			f += strconv.Itoa(e)
+		}
+		if i < len(p.Board)-1 { // add a delimiter between riws
+			f += "/"
+		}
+	}
+	f += " "
+	if common.ColourWhite == p.ActiveColour {
+		f += "w "
+	} else if common.ColourBlack == p.ActiveColour {
+		f += "b "
+	} else {
+		panic("Unsupported color: " + strconv.Itoa(p.ActiveColour))
+	}
+	// Castling
+	c := ""
+	if p.WhiteKingsideCastling {
+		c += "K"
+	}
+	if p.WhiteQueensideCastling {
+		c += "Q"
+	}
+	if p.BlackKingsideCastling {
+		c += "k"
+	}
+	if p.BlackQueensideCastling {
+		c += "q"
+	}
+	if 0 == len(c) {
+		c = "-"
+	}
+	f += c + " "
+
+	// En passant
+	if p.EnPassantTargetColumn == -1 && p.EnPassantTargetRow == -1 {
+		f += "-"
+	} else {
+		var row = -1
+		if common.Row3 == p.EnPassantTargetRow {
+			row = 4
+		} else if common.Row6 == p.EnPassantTargetRow {
+			row = 5
+		} else {
+			panic("Invalid row for en passant: " + strconv.Itoa(p.EnPassantTargetRow))
+		}
+		f += columnToChar(p.EnPassantTargetColumn) + rowToChar(row)
+	}
+	f += " " + strconv.Itoa(p.FiftyMoveClock) + " " + strconv.Itoa(p.FullMoveClock)
+
+	return f
+}
+
 func charToRow(c string) int {
 	var r int
 	switch c {
@@ -160,4 +230,78 @@ func charToPiece(c string) int {
 		panic("Unsupported piece to cast: " + c)
 	}
 	return r
+}
+
+func rowToChar(r int) string {
+	var c string
+	switch r {
+	case 0:
+		c = "1"
+	case 1:
+		c = "2"
+	case 2:
+		c = "3"
+	case 3:
+		c = "4"
+	case 4:
+		c = "5"
+	case 5:
+		c = "6"
+	case 6:
+		c = "7"
+	case 7:
+		c = "8"
+	default:
+		panic("Unsupported row: " + strconv.Itoa(r))
+	}
+	return c
+}
+
+func columnToChar(r int) string {
+	var c string
+	switch r {
+	case 0:
+		c = "a"
+	case 1:
+		c = "b"
+	case 2:
+		c = "c"
+	case 3:
+		c = "d"
+	case 4:
+		c = "e"
+	case 5:
+		c = "f"
+	case 6:
+		c = "g"
+	case 7:
+		c = "h"
+	default:
+		panic("Unsupported column: " + strconv.Itoa(r))
+	}
+	return c
+}
+
+func pieceToChar(p Piece) string {
+	var s string
+	switch p.Type {
+	case common.PiecePawn:
+		s = "p"
+	case common.PieceKnight:
+		s = "n"
+	case common.PieceBishop:
+		s = "b"
+	case common.PieceRook:
+		s = "r"
+	case common.PieceQueen:
+		s = "q"
+	case common.PieceKing:
+		s = "k"
+	default:
+		panic("Unsupported piece to cast: (" + strconv.Itoa(p.Colour) + "/" + strconv.Itoa(p.Type) + ")")
+	}
+	if common.ColourWhite == p.Colour {
+		s = strings.ToUpper(s)
+	}
+	return s
 }
