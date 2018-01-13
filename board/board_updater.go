@@ -68,6 +68,24 @@ func CommitMovement(p Position, m Movement) Position {
 		p.Board[m.DestRow][m.DestColumn].Type = m.CastTo
 	}
 
+	// Disable castling
+	if common.Row1 == m.DestRow {
+		if true == p.WhiteQueensideCastling && (common.ColumnA == m.SourceColumn || common.ColumnA == m.DestColumn || common.ColumnE == m.SourceColumn) {
+			p.WhiteQueensideCastling = false
+		}
+		if true == p.WhiteQueensideCastling && (common.ColumnH == m.SourceColumn || common.ColumnH == m.DestColumn || common.ColumnE == m.SourceColumn) {
+			p.WhiteKingsideCastling = false
+		}
+	}
+	if common.Row8 == m.DestRow {
+		if true == p.BlackQueensideCastling && (common.ColumnA == m.SourceColumn || common.ColumnA == m.DestColumn || common.ColumnE == m.SourceColumn) {
+			p.WhiteQueensideCastling = false
+		}
+		if true == p.BlackQueensideCastling && (common.ColumnH == m.SourceColumn || common.ColumnH == m.DestColumn || common.ColumnE == m.SourceColumn) {
+			p.WhiteKingsideCastling = false
+		}
+	}
+
 	if isPieceCaptured {
 		p.FiftyMoveClock = 0
 	} else {
