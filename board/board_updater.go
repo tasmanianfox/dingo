@@ -79,10 +79,10 @@ func CommitMovement(p Position, m Movement) Position {
 	}
 	if common.Row8 == m.DestRow {
 		if true == p.BlackQueensideCastling && (common.ColumnA == m.SourceColumn || common.ColumnA == m.DestColumn || common.ColumnE == m.SourceColumn) {
-			p.WhiteQueensideCastling = false
+			p.BlackQueensideCastling = false
 		}
 		if true == p.BlackQueensideCastling && (common.ColumnH == m.SourceColumn || common.ColumnH == m.DestColumn || common.ColumnE == m.SourceColumn) {
-			p.WhiteKingsideCastling = false
+			p.BlackKingsideCastling = false
 		}
 	}
 
