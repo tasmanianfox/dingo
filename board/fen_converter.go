@@ -96,24 +96,26 @@ func PositionToFen(p Position) string {
 	f := ""
 	// Pieces
 	for i, r := range p.Board {
-		var e = 0 // num of empty cells
+		e := 0   // num of empty cells
+		fb := "" // buffer for rows
 		for _, pc := range r {
 			if common.ColourEmpty == pc.Colour && common.PieceEmpty == pc.Type {
 				e++
 			} else {
 				if e > 0 { // add the number of empty cells detected previously
-					f += strconv.Itoa(e)
+					fb += strconv.Itoa(e)
 					e = 0
 				}
-				f += pieceToChar(pc)
+				fb += pieceToChar(pc)
 			}
 		}
 		if e > 0 { // add the number of empty cells at the end of row if exists
-			f += strconv.Itoa(e)
+			fb += strconv.Itoa(e)
 		}
 		if i < len(p.Board)-1 { // add a delimiter between riws
-			f += "/"
+			fb = "/" + fb
 		}
+		f = fb + f
 	}
 	f += " "
 	if common.ColourWhite == p.ActiveColour {

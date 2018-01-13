@@ -80,16 +80,17 @@ func (p UciProtocol) getSetPositionCommand(args []string) command.SetPositionCom
 }
 
 func (p UciProtocol) getSetPositionCommandFromFEN(s string) command.SetPositionCommand {
-	c := command.SetPositionCommand{NewGame: false, Mode: command.SetPositionModeDirect}
+	var c command.SetPositionCommand
 	c.Position = board.FenToPosition(s)
 	return c
 }
 
 func (p UciProtocol) getSetPositionCommandFromMovements(movements []string) command.SetPositionCommand {
-	c := command.SetPositionCommand{NewGame: true, Mode: command.SetPositionModeMovements}
+	var c command.SetPositionCommand
+	c.Position = board.BuildStartPosition()
 	for _, ms := range movements {
 		var m = p.stringToMovement(ms)
-		c.AddMovement(m)
+		c.Position = board.CommitMovement(c.Position, m)
 	}
 	return c
 }

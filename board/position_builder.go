@@ -9,7 +9,7 @@ func BuildEmptyPosition() Position {
 		BlackKingsideCastling: false, BlackQueensideCastling: false,
 		EnPassantTargetColumn: -1, EnPassantTargetRow: -1,
 		FiftyMoveClock: 0, FullMoveClock: 0}
-	var pc = Piece{Colour: common.ColourEmpty, Type: common.PieceEmpty}
+	var pc = GetEmptyCell()
 	for i, r := range p.Board {
 		for j := range r {
 			p.Board[i][j] = pc
@@ -27,8 +27,11 @@ func BuildStartPosition() Position {
 		p.Board[common.Row1][i] = Piece{Colour: common.ColourWhite, Type: pt}
 		p.Board[common.Row2][i] = Piece{Colour: common.ColourWhite, Type: common.PiecePawn}
 		p.Board[common.Row8][i] = Piece{Colour: common.ColourBlack, Type: pt}
-		p.Board[common.Row2][i] = Piece{Colour: common.ColourBlack, Type: common.PiecePawn}
+		p.Board[common.Row7][i] = Piece{Colour: common.ColourBlack, Type: common.PiecePawn}
 	}
+	p.FullMoveClock = 1
+	p.FiftyMoveClock = 0
+	p.ActiveColour = common.ColourWhite
 
 	return p
 }
