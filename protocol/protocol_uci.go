@@ -19,6 +19,7 @@ func NewUciProtocol(s *bufio.Scanner, w *bufio.Writer) UciProtocol {
 	var p = UciProtocol{BufferedScanner: s, BufferedWriter: w}
 	p.Output(new(response.AppNameResponse))
 	p.Output(new(response.AuthorResponse))
+	p.Output(new(response.ProtocolConfirmationResponse))
 	return p
 }
 
@@ -58,6 +59,8 @@ func (p UciProtocol) Output(r response.Response) {
 		s = "id name DinGo"
 	case common.ResponseAuthor:
 		s = "id author Sergei Belyakov"
+	case common.ResponseProtocolConfirmation:
+		s = "uciok"
 	default:
 		f = false
 	}

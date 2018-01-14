@@ -149,10 +149,10 @@ func PositionToFen(p Position) string {
 		f += "-"
 	} else {
 		var row = -1
-		if common.Row3 == p.EnPassantTargetRow {
-			row = 4
-		} else if common.Row6 == p.EnPassantTargetRow {
-			row = 5
+		if common.Row4 == p.EnPassantTargetRow {
+			row = common.Row3
+		} else if common.Row5 == p.EnPassantTargetRow {
+			row = common.Row6
 		} else {
 			panic("Invalid row for en passant: " + strconv.Itoa(p.EnPassantTargetRow))
 		}

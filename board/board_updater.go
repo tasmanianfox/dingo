@@ -20,6 +20,16 @@ func CommitMovement(p Position, m Movement) Position {
 	p.Board[m.SourceRow][m.SourceColumn] = GetEmptyCell()
 	p.Board[m.DestRow][m.DestColumn] = pc
 
+	if isPieceCaptured || common.PiecePawn == pc.Type {
+		p.FiftyMoveClock = 0
+	} else {
+		p.FiftyMoveClock++
+	}
+
+	if colour == common.ColourBlack { // Increment clock if the movement is commited by black
+		p.FullMoveClock++
+	}
+
 	// Castlings
 	// White kingside
 	if common.Row1 == m.SourceRow && common.Row1 == m.DestRow &&
@@ -45,8 +55,8 @@ func CommitMovement(p Position, m Movement) Position {
 	// Black queenside
 	if common.Row8 == m.SourceRow && common.Row8 == m.DestRow &&
 		common.ColumnE == m.SourceColumn && common.ColumnC == m.DestColumn &&
-		common.ColourWhite == pc.Colour && common.PieceKing == pc.Type {
-		p.Board[common.Row8][common.ColumnD] = Piece{Colour: common.ColourWhite, Type: common.PieceRook}
+		common.ColourBlack == pc.Colour && common.PieceKing == pc.Type {
+		p.Board[common.Row8][common.ColumnD] = Piece{Colour: common.ColourBlack, Type: common.PieceRook}
 		p.Board[common.Row8][common.ColumnA] = GetEmptyCell()
 	}
 
@@ -70,30 +80,37 @@ func CommitMovement(p Position, m Movement) Position {
 
 	// Disable castling
 	if common.Row1 == m.DestRow {
+		if true == p.WhiteKingsideCastling && (common.ColumnH == m.SourceColumn || common.ColumnH == m.DestColumn || common.ColumnE == m.SourceColumn) {
+			p.WhiteKingsideCastling = false
+		}
 		if true == p.WhiteQueensideCastling && (common.ColumnA == m.SourceColumn || common.ColumnA == m.DestColumn || common.ColumnE == m.SourceColumn) {
 			p.WhiteQueensideCastling = false
 		}
-		if true == p.WhiteQueensideCastling && (common.ColumnH == m.SourceColumn || common.ColumnH == m.DestColumn || common.ColumnE == m.SourceColumn) {
-			p.WhiteKingsideCastling = false
-		}
 	}
 	if common.Row8 == m.DestRow {
+		if true == p.BlackKingsideCastling && (common.ColumnH == m.SourceColumn || common.ColumnH == m.DestColumn || common.ColumnE == m.SourceColumn) {
+			p.BlackKingsideCastling = false
+		}
 		if true == p.BlackQueensideCastling && (common.ColumnA == m.SourceColumn || common.ColumnA == m.DestColumn || common.ColumnE == m.SourceColumn) {
 			p.BlackQueensideCastling = false
 		}
-		if true == p.BlackQueensideCastling && (common.ColumnH == m.SourceColumn || common.ColumnH == m.DestColumn || common.ColumnE == m.SourceColumn) {
-			p.BlackKingsideCastling = false
-		}
 	}
 
-	if isPieceCaptured {
-		p.FiftyMoveClock = 0
+	// Assign the en passant target
+	if (common.ColourWhite == colour && common.Row2 == m.SourceRow && common.Row4 == m.DestRow) ||
+		common.ColourBlack == colour && common.Row7 == m.SourceRow && common.Row5 == m.DestRow {
+		p.EnPassantTargetColumn = m.DestColumn
+		p.EnPassantTargetRow = m.DestRow
 	} else {
-		p.FiftyMoveClock++
+		p.EnPassantTargetColumn = -1
+		p.EnPassantTargetRow = -1
 	}
 
-	if colour == common.ColourBlack { // Increment clock if the movement is commited by black
-		p.FullMoveClock++
+	// Change active player
+	if colour == common.ColourWhite {
+		p.ActiveColour = common.ColourBlack
+	} else {
+		p.ActiveColour = common.ColourWhite
 	}
 
 	return p
