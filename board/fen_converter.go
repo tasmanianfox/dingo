@@ -16,13 +16,13 @@ func FenToPosition(fen string) Position {
 	var rows = strings.Split(data[0], "/")
 	for invRowIndex, row := range rows {
 		var rowIndex = common.NumRows - invRowIndex - 1
-		var colIndex = 0
-		for colIndex < len(row) {
-			var cell = row[colIndex : colIndex+1]
+		colIndex := 0
+		for stringIndex := 0; stringIndex < len(row); stringIndex++ {
+			var cell = row[stringIndex : stringIndex+1]
 			var pc Piece
 			// Cell is numeric: create empty cells
 			if numEmptyCells, err := strconv.Atoi(cell); err == nil {
-				pc = Piece{Colour: common.ColourEmpty, Type: common.PieceEmpty}
+				pc = GetEmptyCell()
 				for i := 0; i < numEmptyCells; i++ {
 					pos.Board[rowIndex][colIndex] = pc
 					colIndex++

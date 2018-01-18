@@ -1,6 +1,8 @@
 package board
 
-import "github.com/tasmanianfox/dingo/common"
+import (
+	"github.com/tasmanianfox/dingo/common"
+)
 
 // GetAttackMap returns a 2-dimensional array which represents a set of fields
 // If specific fields is under attack of player c, the corresponding item equals "true"
@@ -30,18 +32,6 @@ func GetAttackMap(p Position, c int) [common.NumRows][common.NumColumns]bool {
 	}
 
 	return m
-}
-
-// IsKingChecked returns true if player's c king is checked at position p
-func IsKingChecked(p Position, c int) bool {
-	am := GetAttackMap(p, common.GetOpponent(c))
-	r, c := p.LocateKing(p.ActiveColour)
-	result := false
-	if am[r][c] {
-		result = true
-	}
-
-	return result
 }
 
 func getKingAttackMap(row int, col int) [common.NumRows][common.NumColumns]bool {
@@ -119,7 +109,7 @@ func getPawnAttackMap(row int, col int, colour int) [common.NumRows][common.NumC
 			if IsColumnOutOfBoard(testCol) {
 				continue
 			}
-			m[testCol][testRow] = true
+			m[testRow][testCol] = true
 		}
 	}
 
@@ -128,7 +118,7 @@ func getPawnAttackMap(row int, col int, colour int) [common.NumRows][common.NumC
 
 // getVectorBasedAttackMap calculates attack map for pieces with linear attacks (queen, rook, bishop)
 func getVectorBasedAttackMap(vs [][2]int, b [common.NumRows][common.NumColumns]Piece, row int, col int) [common.NumRows][common.NumColumns]bool {
-	m := [common.NumRows][common.NumColumns]bool{}
+	m := initAttackMap()
 
 	for _, vector := range vs {
 		rowVector := vector[0]
@@ -155,7 +145,7 @@ func getVectorBasedAttackMap(vs [][2]int, b [common.NumRows][common.NumColumns]P
 func initAttackMap() [common.NumRows][common.NumColumns]bool {
 	m := [common.NumRows][common.NumColumns]bool{}
 	for row := 0; row < common.NumRows; row++ {
-		for col := 0; row < common.NumColumns; col++ {
+		for col := 0; col < common.NumColumns; col++ {
 			m[row][col] = false
 		}
 	}
@@ -167,7 +157,7 @@ func mergeAttackMaps(a [common.NumRows][common.NumColumns]bool, b [common.NumRow
 	c := [common.NumRows][common.NumColumns]bool{}
 	for row := 0; row < common.NumRows; row++ {
 		for col := 0; col < common.NumColumns; col++ {
-			c[row][col] = a[col][row] || b[col][row]
+			c[row][col] = a[row][col] || b[row][col]
 		}
 	}
 
