@@ -20,28 +20,19 @@ func FindAllAvailableMoves(p Position) []Move {
 				continue
 			}
 
-			ms2 := []Move{}
 			switch piece.Type {
 			case common.PieceKing:
-				ms2 = append(ms, findKingMoves(p, row, col)...)
+				ms = append(ms, findKingMoves(p, row, col)...)
 			case common.PieceQueen:
-				ms2 = append(ms, findUsualPieceMoves(p, row, col)...)
+				ms = append(ms, findUsualPieceMoves(p, row, col)...)
 			case common.PieceRook:
-				ms2 = append(ms, findUsualPieceMoves(p, row, col)...)
+				ms = append(ms, findUsualPieceMoves(p, row, col)...)
 			case common.PieceBishop:
-				ms2 = append(ms, findUsualPieceMoves(p, row, col)...)
+				ms = append(ms, findUsualPieceMoves(p, row, col)...)
 			case common.PieceKnight:
-				ms2 = append(ms, findUsualPieceMoves(p, row, col)...)
+				ms = append(ms, findUsualPieceMoves(p, row, col)...)
 			case common.PiecePawn:
-				ms2 = append(ms, findPieceMoves(p, row, col)...)
-			}
-
-			// Filter out those moves that lead to own king being checked
-			for _, m := range ms2 {
-				p2 := CommitMove(p, m)
-				if !p2.IsKingChecked(p.ActiveColour) {
-					ms = append(ms, m)
-				}
+				ms = append(ms, findPieceMoves(p, row, col)...)
 			}
 		}
 	}
@@ -62,7 +53,7 @@ func findKingMoves(p Position, row int, col int) []Move {
 				continue
 			}
 
-			ms = append(ms, Move{SourceRow: row, SourceColumn: col, DestRow: sRow, DestColumn: sCol})
+			ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: sRow, DestColumn: sCol})
 		}
 	}
 
@@ -76,12 +67,12 @@ func findKingMoves(p Position, row int, col int) []Move {
 		if castlingDatum.Colour == p.ActiveColour && !oam[castlingDatum.Row][common.ColumnE] {
 			if castlingDatum.KingsideFlag && !oam[castlingDatum.Row][common.ColumnF] &&
 				p.IsEmptyCell(common.ColumnF, castlingDatum.Row) && p.IsEmptyCell(common.ColumnG, castlingDatum.Row) {
-				ms = append(ms, Move{DestRow: castlingDatum.Row, DestColumn: common.ColumnG})
+				ms = appendMoveIfValid(p, ms, Move{SourceColumn: common.ColumnE, SourceRow: castlingDatum.Row, DestRow: castlingDatum.Row, DestColumn: common.ColumnG})
 			}
 			if castlingDatum.QueensideFlag && !oam[castlingDatum.Row][common.ColumnD] && !oam[castlingDatum.Row][common.ColumnC] &&
 				p.IsEmptyCell(common.ColumnB, castlingDatum.Row) && p.IsEmptyCell(common.ColumnC, castlingDatum.Row) &&
 				p.IsEmptyCell(common.ColumnD, castlingDatum.Row) {
-				ms = append(ms, Move{DestRow: castlingDatum.Row, DestColumn: common.ColumnC})
+				ms = appendMoveIfValid(p, ms, Move{SourceColumn: common.ColumnE, SourceRow: castlingDatum.Row, DestRow: castlingDatum.Row, DestColumn: common.ColumnC})
 			}
 		}
 	}
@@ -103,12 +94,12 @@ func findUsualPieceMoves(p Position, row int, col int) []Move {
 		am = getQueenAttackMap(p.Board, row, col)
 	}
 
-	for testRow, cells := range am {
-		for testCol := range cells {
-			if p.ActiveColour == p.Board[testRow][testRow].Colour {
+	for testRow, attackMapColumns := range am {
+		for testCol, attackMapColumn := range attackMapColumns {
+			if false == attackMapColumn || p.ActiveColour == p.Board[testRow][testCol].Colour {
 				continue
 			}
-			ms = append(ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
+			ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
 		}
 	}
 
@@ -127,9 +118,19 @@ func findPieceMoves(p Position, row int, col int) []Move {
 
 			if (p.Board[testRow][testCol].Colour == common.GetOpponent(p.ActiveColour)) ||
 				(p.EnPassantTargetColumn == testCol && p.EnPassantTargetRow == row) {
-				ms = append(ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
+				ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
 			}
 		}
+	}
+
+	return ms
+}
+
+// Validates the new position. If position is valid appends the move to array
+func appendMoveIfValid(p Position, ms []Move, m Move) []Move {
+	p2 := CommitMove(p, m)
+	if !p2.IsKingChecked(p.ActiveColour) {
+		ms = append(ms, m)
 	}
 
 	return ms

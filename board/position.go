@@ -35,30 +35,30 @@ func (p Position) GetPieceAt(c int, r int) Piece {
 
 // LocateKing returns row and column of player's c king
 func (p Position) LocateKing(c int) (int, int) {
-	r, c := -1, -1
+	resultRow, resultCol := -1, -1
 	for row, cells := range p.Board {
 		for column, piece := range cells {
 			if piece.Colour == c && piece.Type == common.PieceKing {
-				r = row
-				c = column
+				resultRow = row
+				resultCol = column
 				break
 			}
 		}
 	}
 
-	if -1 == r || -1 == c {
+	if -1 == resultRow || -1 == resultCol {
 		panic("Could not locate the king of player " + strconv.Itoa(c))
 	}
 
-	return r, c
+	return resultRow, resultCol
 }
 
 // IsKingChecked returns true if player's c king is checked at position p
 func (p Position) IsKingChecked(c int) bool {
 	am := GetAttackMap(p, common.GetOpponent(c))
-	r, c := p.LocateKing(p.ActiveColour)
+	row, col := p.LocateKing(c)
 	result := false
-	if am[r][c] {
+	if am[row][col] {
 		result = true
 	}
 
