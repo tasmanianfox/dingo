@@ -25,6 +25,7 @@ func TestFindKingMoves(t *testing.T) {
 		kingPosition{Fen: "r3k2r/8/N7/1b6/8/8/8/R3K2R w KQkq - 0 1", Column: common.ColumnE, Row: common.Row1, Moves: 4},
 		kingPosition{Fen: "r3k2r/8/N7/1b6/8/8/8/R3K2R b KQkq - 0 1", Column: common.ColumnE, Row: common.Row8, Moves: 7},
 		kingPosition{Fen: "rnbqk2r/pppp1ppp/4Q2n/2b1p3/4P3/8/PPPPBPPP/RNB1K1NR b KQkq - 0 1", Column: common.ColumnE, Row: common.Row8, Moves: 1},
+		kingPosition{Fen: "8/8/5P2/4Kb2/3r4/4n3/8/4k3 w - - 0 1", Column: common.ColumnE, Row: common.Row2, Moves: 3},
 	}
 
 	for i, pd := range pds {
