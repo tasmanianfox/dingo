@@ -4,6 +4,13 @@ import (
 	"github.com/tasmanianfox/dingo/common"
 )
 
+type castlingData struct {
+	Colour        int
+	KingsideFlag  bool
+	QueensideFlag bool
+	Row           int
+}
+
 // FindAllAvailableMoves finds all available moves for active player
 func FindAllAvailableMoves(p Position) []Move {
 	ms := []Move{}
@@ -44,14 +51,13 @@ func FindAllAvailableMoves(p Position) []Move {
 
 func findKingMoves(p Position, row int, col int) []Move {
 	ms := []Move{}
-	oc := common.GetOpponent(p.ActiveColour)
-	oam := GetAttackMap(p, oc)
+	oam := GetAttackMap(p, common.GetOpponent(p.ActiveColour))
 
 	for sRow := row - 1; sRow <= row+1; sRow++ {
 		if IsRowOutOfBoard(sRow) {
 			continue
 		}
-		for sCol := col - 1; sCol <= col+1; sCol++ {
+		for sCol := col + 1; sCol >= col-1; sCol-- {
 			if IsColumnOutOfBoard(sCol) || (sRow == row && sCol == col) || true == oam[sRow][sCol] || p.ActiveColour == p.Board[sRow][sCol].Colour {
 				continue
 			}
@@ -61,12 +67,22 @@ func findKingMoves(p Position, row int, col int) []Move {
 	}
 
 	// Castlings
-	if common.ColourWhite == p.ActiveColour && !oam[common.Row1][common.ColumnE] {
-		if p.WhiteKingsideCastling && !oam[common.Row1][common.ColumnF] {
-			ms = append(ms, Move{DestRow: common.Row1, DestColumn: common.ColumnG})
-		}
-		if p.WhiteQueensideCastling && !oam[common.Row1][common.ColumnD] && !oam[common.Row1][common.ColumnC] {
-			ms = append(ms, Move{DestRow: common.Row1, DestColumn: common.ColumnC})
+	cd := [2]castlingData{
+		castlingData{Colour: common.ColourWhite, KingsideFlag: p.WhiteKingsideCastling, QueensideFlag: p.WhiteQueensideCastling, Row: common.Row1},
+		castlingData{Colour: common.ColourBlack, KingsideFlag: p.BlackKingsideCastling, QueensideFlag: p.BlackQueensideCastling, Row: common.Row8},
+	}
+
+	for _, castlingDatum := range cd {
+		if castlingDatum.Colour == p.ActiveColour && !oam[castlingDatum.Row][common.ColumnE] {
+			if castlingDatum.KingsideFlag && !oam[castlingDatum.Row][common.ColumnF] &&
+				p.IsEmptyCell(common.ColumnF, castlingDatum.Row) && p.IsEmptyCell(common.ColumnG, castlingDatum.Row) {
+				ms = append(ms, Move{DestRow: castlingDatum.Row, DestColumn: common.ColumnG})
+			}
+			if castlingDatum.QueensideFlag && !oam[castlingDatum.Row][common.ColumnD] && !oam[castlingDatum.Row][common.ColumnC] &&
+				p.IsEmptyCell(common.ColumnB, castlingDatum.Row) && p.IsEmptyCell(common.ColumnC, castlingDatum.Row) &&
+				p.IsEmptyCell(common.ColumnD, castlingDatum.Row) {
+				ms = append(ms, Move{DestRow: castlingDatum.Row, DestColumn: common.ColumnC})
+			}
 		}
 	}
 

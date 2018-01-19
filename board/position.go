@@ -25,7 +25,7 @@ type Position struct {
 
 // IsEmptyCell returns true if the cell at column c and row r is empty
 func (p Position) IsEmptyCell(c int, r int) bool {
-	return common.ColourEmpty == p.Board[r][c].Colour && common.PieceEmpty == p.Board[r][c].Type
+	return common.ColourEmpty == p.Board[r][c].Colour
 }
 
 // GetPieceAt returns a piece that is located at column c and row r
