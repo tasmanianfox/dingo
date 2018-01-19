@@ -11,6 +11,12 @@ type castlingData struct {
 	Row           int
 }
 
+type pawnData struct {
+	Colour    int
+	FistRow   int
+	Increment int
+}
+
 // FindAllAvailableMoves finds all available moves for active player
 func FindAllAvailableMoves(p Position) []Move {
 	ms := []Move{}
@@ -32,7 +38,7 @@ func FindAllAvailableMoves(p Position) []Move {
 			case common.PieceKnight:
 				ms = append(ms, findUsualPieceMoves(p, row, col)...)
 			case common.PiecePawn:
-				ms = append(ms, findPieceMoves(p, row, col)...)
+				ms = append(ms, findPawnMoves(p, row, col)...)
 			}
 		}
 	}
@@ -106,9 +112,32 @@ func findUsualPieceMoves(p Position, row int, col int) []Move {
 	return ms
 }
 
-func findPieceMoves(p Position, row int, col int) []Move {
+func findPawnMoves(p Position, row int, col int) []Move {
 	ms := []Move{}
 
+	// Moves
+	pda := []pawnData{
+		pawnData{Colour: common.ColourWhite, FistRow: common.Row2, Increment: 1},
+		pawnData{Colour: common.ColourBlack, FistRow: common.Row7, Increment: -1},
+	}
+
+	for _, pd := range pda {
+		if pd.Colour != p.ActiveColour {
+			continue
+		}
+		destRow := row + pd.Increment
+		if p.IsEmptyCell(col, destRow) {
+			ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col})
+			if row == pd.FistRow {
+				destRow := destRow + pd.Increment
+				if p.IsEmptyCell(col, destRow) {
+					ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col})
+				}
+			}
+		}
+	}
+
+	// Attacks
 	am := getPawnAttackMap(row, col, p.ActiveColour)
 	for testRow, cells := range am {
 		for testCol, isUnderAttack := range cells {

@@ -54,3 +54,20 @@ func TestFindUsualPieceMoves(t *testing.T) {
 		}
 	}
 }
+
+func TestFindPawnPieceMoves(t *testing.T) {
+	pds := [...]testData{
+		testData{Fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", Column: common.ColumnG, Row: common.Row2, Moves: 2},
+		testData{Fen: "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", Column: common.ColumnE, Row: common.Row4, Moves: 2},
+		testData{Fen: "rnbqkbnr/ppp1pppp/8/4P3/2Pp4/8/PP1P1PPP/RNBQKBNR b KQkq c3 0 1", Column: common.ColumnD, Row: common.Row4, Moves: 2},
+		testData{Fen: "rnbqkbnr/pp2p1pp/4P3/3p1p2/5P2/2p5/PPPP2PP/RNBQKBNR w KQkq - 0 1", Column: common.ColumnE, Row: common.Row6, Moves: 0},
+	}
+
+	for i, pd := range pds {
+		p := FenToPosition(pd.Fen)
+		ms := findPawnMoves(p, pd.Row, pd.Column)
+		if len(ms) != pd.Moves {
+			t.Errorf("Incorrect number of available moves (%d) %d %x", i, len(ms), ms)
+		}
+	}
+}
