@@ -6,12 +6,12 @@ import (
 	"github.com/tasmanianfox/dingo/common"
 )
 
-// CommitMovement Performs a movement m using position p
-func CommitMovement(p Position, m Movement) Position {
+// CommitMove Performs a move m using position p
+func CommitMove(p Position, m Move) Position {
 	pc := p.Board[m.SourceRow][m.SourceColumn]
 	if pc.Colour == common.ColourEmpty || pc.Type == common.PieceEmpty {
 		panic("Cannot move from specified cell. The cell is empty: type " + strconv.Itoa(pc.Type) + " / colour " +
-			strconv.Itoa(pc.Colour) + ", position: " + PositionToFen(p) + ", movement " + strconv.Itoa(m.SourceColumn) + strconv.Itoa(m.SourceRow) + "-" +
+			strconv.Itoa(pc.Colour) + ", position: " + PositionToFen(p) + ", move " + strconv.Itoa(m.SourceColumn) + strconv.Itoa(m.SourceRow) + "-" +
 			strconv.Itoa(m.DestColumn) + strconv.Itoa(m.DestRow))
 	}
 	isPieceCaptured := !p.IsEmptyCell(m.DestColumn, m.DestRow)
@@ -26,7 +26,7 @@ func CommitMovement(p Position, m Movement) Position {
 		p.FiftyMoveClock++
 	}
 
-	if colour == common.ColourBlack { // Increment clock if the movement is commited by black
+	if colour == common.ColourBlack { // Increment clock if the move is commited by black
 		p.FullMoveClock++
 	}
 

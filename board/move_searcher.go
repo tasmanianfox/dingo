@@ -5,15 +5,15 @@ import (
 )
 
 // FindAllAvailableMoves finds all available moves for active player
-func FindAllAvailableMoves(p Position) []Movement {
-	ms := []Movement{}
+func FindAllAvailableMoves(p Position) []Move {
+	ms := []Move{}
 	for row, cells := range p.Board {
 		for col, piece := range cells {
 			if piece.Colour != p.ActiveColour {
 				continue
 			}
 
-			ms2 := []Movement{}
+			ms2 := []Move{}
 			switch piece.Type {
 			case common.PieceKing:
 				ms2 = append(ms, findKingMoves(p, row, col)...)
@@ -31,7 +31,7 @@ func FindAllAvailableMoves(p Position) []Movement {
 
 			// Filter out those moves that lead to own king being checked
 			for _, m := range ms2 {
-				p2 := CommitMovement(p, m)
+				p2 := CommitMove(p, m)
 				if !p2.IsKingChecked(p.ActiveColour) {
 					ms = append(ms, m)
 				}
@@ -42,8 +42,8 @@ func FindAllAvailableMoves(p Position) []Movement {
 	return ms
 }
 
-func findKingMoves(p Position, row int, col int) []Movement {
-	ms := []Movement{}
+func findKingMoves(p Position, row int, col int) []Move {
+	ms := []Move{}
 	oc := common.GetOpponent(p.ActiveColour)
 	oam := GetAttackMap(p, oc)
 
@@ -56,25 +56,25 @@ func findKingMoves(p Position, row int, col int) []Movement {
 				continue
 			}
 
-			ms = append(ms, Movement{SourceRow: row, SourceColumn: col, DestRow: sRow, DestColumn: sCol})
+			ms = append(ms, Move{SourceRow: row, SourceColumn: col, DestRow: sRow, DestColumn: sCol})
 		}
 	}
 
 	// Castlings
 	if common.ColourWhite == p.ActiveColour && !oam[common.Row1][common.ColumnE] {
 		if p.WhiteKingsideCastling && !oam[common.Row1][common.ColumnF] {
-			ms = append(ms, Movement{DestRow: common.Row1, DestColumn: common.ColumnG})
+			ms = append(ms, Move{DestRow: common.Row1, DestColumn: common.ColumnG})
 		}
 		if p.WhiteQueensideCastling && !oam[common.Row1][common.ColumnD] && !oam[common.Row1][common.ColumnC] {
-			ms = append(ms, Movement{DestRow: common.Row1, DestColumn: common.ColumnC})
+			ms = append(ms, Move{DestRow: common.Row1, DestColumn: common.ColumnC})
 		}
 	}
 
 	return ms
 }
 
-func findUsualPieceMoves(p Position, row int, col int) []Movement {
-	ms := []Movement{}
+func findUsualPieceMoves(p Position, row int, col int) []Move {
+	ms := []Move{}
 	am := [common.NumRows][common.NumColumns]bool{}
 	switch p.Board[row][col].Type {
 	case common.PieceKnight:
@@ -92,15 +92,15 @@ func findUsualPieceMoves(p Position, row int, col int) []Movement {
 			if p.ActiveColour == p.Board[testRow][testRow].Colour {
 				continue
 			}
-			ms = append(ms, Movement{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
+			ms = append(ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
 		}
 	}
 
 	return ms
 }
 
-func findPieceMoves(p Position, row int, col int) []Movement {
-	ms := []Movement{}
+func findPieceMoves(p Position, row int, col int) []Move {
+	ms := []Move{}
 
 	am := getPawnAttackMap(row, col, p.ActiveColour)
 	for testRow, cells := range am {
@@ -111,7 +111,7 @@ func findPieceMoves(p Position, row int, col int) []Movement {
 
 			if (p.Board[testRow][testCol].Colour == common.GetOpponent(p.ActiveColour)) ||
 				(p.EnPassantTargetColumn == testCol && p.EnPassantTargetRow == row) {
-				ms = append(ms, Movement{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
+				ms = append(ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
 			}
 		}
 	}

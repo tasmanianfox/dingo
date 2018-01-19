@@ -74,7 +74,7 @@ func (p UciProtocol) Output(r response.Response) {
 func (p UciProtocol) getSetPositionCommand(args []string) command.SetPositionCommand {
 	var c command.SetPositionCommand
 	if len(args) >= 3 && "startpos" == args[0] && "moves" == args[1] {
-		c = p.getSetPositionCommandFromMovements(args[2:])
+		c = p.getSetPositionCommandFromMoves(args[2:])
 	} else if 7 == len(args) && "fen" == args[0] {
 		c = p.getSetPositionCommandFromFEN(strings.Join(args[1:], " "))
 	}
@@ -88,23 +88,23 @@ func (p UciProtocol) getSetPositionCommandFromFEN(s string) command.SetPositionC
 	return c
 }
 
-func (p UciProtocol) getSetPositionCommandFromMovements(movements []string) command.SetPositionCommand {
+func (p UciProtocol) getSetPositionCommandFromMoves(moves []string) command.SetPositionCommand {
 	var c command.SetPositionCommand
 	c.Position = board.BuildStartPosition()
-	for _, ms := range movements {
-		var m = p.stringToMovement(ms)
-		c.Position = board.CommitMovement(c.Position, m)
+	for _, ms := range moves {
+		var m = p.stringToMove(ms)
+		c.Position = board.CommitMove(c.Position, m)
 	}
 	return c
 }
 
 // Replacements
 
-func (p UciProtocol) stringToMovement(s string) board.Movement {
+func (p UciProtocol) stringToMove(s string) board.Move {
 	if len(s) < 4 {
-		panic("Movement must be at least 4 characters long")
+		panic("Move must be at least 4 characters long")
 	}
-	var m board.Movement
+	var m board.Move
 	m.SourceColumn = p.charToColumn(s[0:1])
 	m.SourceRow = p.charToRow(s[1:2])
 	m.DestColumn = p.charToColumn(s[2:3])

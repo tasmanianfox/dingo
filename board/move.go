@@ -1,6 +1,6 @@
 package board
 
-type Movement struct {
+type Move struct {
 	SourceRow    int
 	SourceColumn int
 	DestRow      int
