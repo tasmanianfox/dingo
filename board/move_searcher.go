@@ -60,7 +60,7 @@ func findKingMoves(p Position, row int, col int) []Move {
 				continue
 			}
 
-			ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: sRow, DestColumn: sCol})
+			ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: sRow, DestColumn: sCol, CastTo: -1})
 		}
 	}
 
@@ -74,12 +74,12 @@ func findKingMoves(p Position, row int, col int) []Move {
 		if castlingDatum.Colour == p.ActiveColour && !oam[castlingDatum.Row][common.ColumnE] {
 			if castlingDatum.KingsideFlag && !oam[castlingDatum.Row][common.ColumnF] &&
 				p.IsEmptyCell(common.ColumnF, castlingDatum.Row) && p.IsEmptyCell(common.ColumnG, castlingDatum.Row) {
-				ms = appendMoveIfValid(p, ms, Move{SourceColumn: common.ColumnE, SourceRow: castlingDatum.Row, DestRow: castlingDatum.Row, DestColumn: common.ColumnG})
+				ms = appendMoveIfValid(p, ms, Move{SourceColumn: common.ColumnE, SourceRow: castlingDatum.Row, DestRow: castlingDatum.Row, DestColumn: common.ColumnG, CastTo: -1})
 			}
 			if castlingDatum.QueensideFlag && !oam[castlingDatum.Row][common.ColumnD] && !oam[castlingDatum.Row][common.ColumnC] &&
 				p.IsEmptyCell(common.ColumnB, castlingDatum.Row) && p.IsEmptyCell(common.ColumnC, castlingDatum.Row) &&
 				p.IsEmptyCell(common.ColumnD, castlingDatum.Row) {
-				ms = appendMoveIfValid(p, ms, Move{SourceColumn: common.ColumnE, SourceRow: castlingDatum.Row, DestRow: castlingDatum.Row, DestColumn: common.ColumnC})
+				ms = appendMoveIfValid(p, ms, Move{SourceColumn: common.ColumnE, SourceRow: castlingDatum.Row, DestRow: castlingDatum.Row, DestColumn: common.ColumnC, CastTo: -1})
 			}
 		}
 	}
@@ -106,7 +106,7 @@ func findUsualPieceMoves(p Position, row int, col int) []Move {
 			if false == attackMapColumn || p.ActiveColour == p.Board[testRow][testCol].Colour {
 				continue
 			}
-			ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
+			ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol, CastTo: -1})
 		}
 	}
 
@@ -134,11 +134,11 @@ func findPawnMoves(p Position, row int, col int) []Move {
 					ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col, CastTo: pieceToCast})
 				}
 			} else {
-				ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col})
+				ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col, CastTo: -1})
 				if row == pd.FistRow {
 					destRow := destRow + pd.Increment
 					if p.IsEmptyCell(col, destRow) {
-						ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col})
+						ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col, CastTo: -1})
 					}
 				}
 			}
@@ -155,7 +155,7 @@ func findPawnMoves(p Position, row int, col int) []Move {
 
 			if (p.Board[testRow][testCol].Colour == common.GetOpponent(p.ActiveColour)) ||
 				(p.EnPassantTargetColumn == testCol && p.EnPassantTargetRow == row) {
-				ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol})
+				ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: testRow, DestColumn: testCol, CastTo: -1})
 			}
 		}
 	}

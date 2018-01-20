@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/tasmanianfox/dingo/command"
 	"github.com/tasmanianfox/dingo/common"
 	"github.com/tasmanianfox/dingo/engine"
 	"github.com/tasmanianfox/dingo/protocol"
@@ -31,22 +30,28 @@ func Run(r io.Reader, w io.Writer) {
 		panic("Could not determine the protocol")
 	}
 
-	var e engine.Engine
-	var c command.Command = nil
-	var success bool
-	var response response.Response = nil
+	ch := make(chan response.Response)
+	e := engine.Engine{ResponseChannel: ch}
+	go ReadResponseAsync(p, ch)
 	for {
-		c, success = p.ReadCommand()
+		c, success := p.ReadCommand()
 		if false == success {
 			continue
 		}
 
-		response, success = e.HandleCommand(c)
+		response, success := e.HandleCommand(c)
 		if false == success {
 			continue
 		} else if (response != nil) && (common.ResponseQuit == response.GetType()) {
 			break
 		}
 		p.Output(response)
+	}
+}
+
+func ReadResponseAsync(p protocol.Protocol, ch chan response.Response) {
+	for {
+		r := <-ch
+		p.Output(r)
 	}
 }

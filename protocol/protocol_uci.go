@@ -2,6 +2,8 @@ package protocol
 
 import (
 	"bufio"
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/tasmanianfox/dingo/board"
@@ -38,6 +40,8 @@ func (p UciProtocol) ReadCommand() (command.Command, bool) {
 			c = new(command.CheckIfIsEngineReadyCommand)
 		case "position":
 			c = p.getSetPositionCommand(arg)
+		case "go":
+			c = command.CalculateMoveCommand{}
 		case "quit":
 			c = new(command.QuitCommand)
 		default:
@@ -61,6 +65,22 @@ func (p UciProtocol) Output(r response.Response) {
 		s = "id author Sergei Belyakov"
 	case common.ResponseProtocolConfirmation:
 		s = "uciok"
+	case common.ResponseMove:
+		r2 := r.(response.MoveResponse)
+		m := r2.Move
+		cp := ""
+		if m.CastTo > -1 {
+			cp = p.pieceToChar(m.CastTo)
+		}
+		s = fmt.Sprintf(
+			"bestmove %s%s%s%s%s",
+			p.columnToChar(m.SourceColumn),
+			p.rowToChar(m.SourceRow),
+			p.columnToChar(m.DestColumn),
+			p.rowToChar(m.DestRow),
+			cp,
+		)
+
 	default:
 		f = false
 	}
@@ -119,21 +139,21 @@ func (p UciProtocol) charToRow(c string) int {
 	var r int
 	switch c {
 	case "1":
-		r = 0
+		r = common.Row1
 	case "2":
-		r = 1
+		r = common.Row2
 	case "3":
-		r = 2
+		r = common.Row3
 	case "4":
-		r = 3
+		r = common.Row4
 	case "5":
-		r = 4
+		r = common.Row5
 	case "6":
-		r = 5
+		r = common.Row6
 	case "7":
-		r = 6
+		r = common.Row7
 	case "8":
-		r = 7
+		r = common.Row8
 	default:
 		panic("Unsupported row: " + c)
 	}
@@ -144,25 +164,75 @@ func (p UciProtocol) charToColumn(c string) int {
 	var r int
 	switch c {
 	case "a":
-		r = 0
+		r = common.ColumnA
 	case "b":
-		r = 1
+		r = common.ColumnB
 	case "c":
-		r = 2
+		r = common.ColumnC
 	case "d":
-		r = 3
+		r = common.ColumnD
 	case "e":
-		r = 4
+		r = common.ColumnE
 	case "f":
-		r = 5
+		r = common.ColumnF
 	case "g":
-		r = 6
+		r = common.ColumnG
 	case "h":
-		r = 7
+		r = common.ColumnH
 	default:
 		panic("Unsupported column: " + c)
 	}
 	return r
+}
+
+func (p UciProtocol) rowToChar(r int) string {
+	var res string
+	switch r {
+	case common.Row1:
+		res = "1"
+	case common.Row2:
+		res = "2"
+	case common.Row3:
+		res = "3"
+	case common.Row4:
+		res = "4"
+	case common.Row5:
+		res = "5"
+	case common.Row6:
+		res = "6"
+	case common.Row7:
+		res = "7"
+	case common.Row8:
+		res = "8"
+	default:
+		panic("Unsupported row: " + strconv.Itoa(r))
+	}
+	return res
+}
+
+func (p UciProtocol) columnToChar(c int) string {
+	var res string
+	switch c {
+	case common.ColumnA:
+		res = "a"
+	case common.ColumnB:
+		res = "b"
+	case common.ColumnC:
+		res = "c"
+	case common.ColumnD:
+		res = "d"
+	case common.ColumnE:
+		res = "e"
+	case common.ColumnF:
+		res = "f"
+	case common.ColumnG:
+		res = "g"
+	case common.ColumnH:
+		res = "h"
+	default:
+		panic("Unsupported column: " + strconv.Itoa(c))
+	}
+	return res
 }
 
 func (p UciProtocol) charToPiece(c string) int {
@@ -184,4 +254,25 @@ func (p UciProtocol) charToPiece(c string) int {
 		panic("Unsupported piece to cast: " + c)
 	}
 	return r
+}
+
+func (p UciProtocol) pieceToChar(c int) string {
+	var res string
+	switch c {
+	case common.PiecePawn:
+		res = "p"
+	case common.PieceKnight:
+		res = "n"
+	case common.PieceBishop:
+		res = "b"
+	case common.PieceRook:
+		res = "r"
+	case common.PieceQueen:
+		res = "q"
+	case common.PieceKing:
+		res = "k"
+	default:
+		panic("Unsupported piece to cast: " + strconv.Itoa(c))
+	}
+	return res
 }

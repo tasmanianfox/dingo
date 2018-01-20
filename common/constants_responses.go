@@ -7,4 +7,5 @@ const (
 	ResponseAuthor               = 2
 	ResponseAppName              = 3
 	ResponseProtocolConfirmation = 4
+	ResponseMove                 = 5
 )
