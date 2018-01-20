@@ -93,8 +93,8 @@ func (p UciProtocol) Output(r response.Response) {
 
 func (p UciProtocol) getSetPositionCommand(args []string) command.SetPositionCommand {
 	var c command.SetPositionCommand
-	if len(args) >= 3 && "startpos" == args[0] && "moves" == args[1] {
-		c = p.getSetPositionCommandFromMoves(args[2:])
+	if "startpos" == args[0] {
+		c = p.getSetPositionCommandFromMoves(args[1:])
 	} else if 7 == len(args) && "fen" == args[0] {
 		c = p.getSetPositionCommandFromFEN(strings.Join(args[1:], " "))
 	}
@@ -108,13 +108,17 @@ func (p UciProtocol) getSetPositionCommandFromFEN(s string) command.SetPositionC
 	return c
 }
 
-func (p UciProtocol) getSetPositionCommandFromMoves(moves []string) command.SetPositionCommand {
+func (p UciProtocol) getSetPositionCommandFromMoves(args []string) command.SetPositionCommand {
 	var c command.SetPositionCommand
 	c.Position = board.BuildStartPosition()
-	for _, ms := range moves {
-		var m = p.stringToMove(ms)
-		c.Position = board.CommitMove(c.Position, m)
+	if len(args) > 0 && "moves" == args[0] {
+		moves := args[1:]
+		for _, ms := range moves {
+			var m = p.stringToMove(ms)
+			c.Position = board.CommitMove(c.Position, m)
+		}
 	}
+
 	return c
 }
 

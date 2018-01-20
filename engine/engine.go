@@ -40,12 +40,18 @@ func (e *Engine) HandleCommand(c command.Command) (response.Response, bool) {
 }
 
 func (e Engine) calculateMove(c command.CalculateMoveCommand) {
-	// time.Sleep(2 * time.Second)
-	// m := board.Move{SourceColumn: common.ColumnE, SourceRow: common.Row2, DestColumn: common.ColumnE, DestRow: common.Row4}
 	rand.Seed(time.Now().UnixNano())
 	ms := board.FindAllAvailableMoves(e.Position)
-	m := ms[rand.Intn(len(ms)-1)]
-	r := response.MoveResponse{Move: m}
 
+	numMs := len(ms)
+	m := board.Move{}
+	if numMs > 1 {
+		m = ms[rand.Intn(len(ms)-1)]
+	} else if numMs == 1 {
+		m = ms[0]
+	} else {
+		panic("Cannot find any moves")
+	}
+	r := response.MoveResponse{Move: m}
 	e.ResponseChannel <- r
 }

@@ -49,6 +49,9 @@ func TestReadCommand(t *testing.T) {
 	if !ok {
 		t.Errorf("Expected type: command.SetPositionCommand")
 	}
+	if common.ColourBlack != c2.Position.ActiveColour {
+		t.Errorf("Expected active colour: black")
+	}
 
 	r = strings.NewReader("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - e3 0 1\n")
 	s = bufio.NewScanner(r)
