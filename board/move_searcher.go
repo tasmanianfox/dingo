@@ -12,9 +12,10 @@ type castlingData struct {
 }
 
 type pawnData struct {
-	Colour    int
-	FistRow   int
-	Increment int
+	Colour       int
+	FistRow      int
+	PromotionRow int
+	Increment    int
 }
 
 // FindAllAvailableMoves finds all available moves for active player
@@ -117,8 +118,8 @@ func findPawnMoves(p Position, row int, col int) []Move {
 
 	// Moves
 	pda := []pawnData{
-		pawnData{Colour: common.ColourWhite, FistRow: common.Row2, Increment: 1},
-		pawnData{Colour: common.ColourBlack, FistRow: common.Row7, Increment: -1},
+		pawnData{Colour: common.ColourWhite, FistRow: common.Row2, PromotionRow: common.Row8, Increment: 1},
+		pawnData{Colour: common.ColourBlack, FistRow: common.Row7, PromotionRow: common.Row1, Increment: -1},
 	}
 
 	for _, pd := range pda {
@@ -127,11 +128,18 @@ func findPawnMoves(p Position, row int, col int) []Move {
 		}
 		destRow := row + pd.Increment
 		if p.IsEmptyCell(col, destRow) {
-			ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col})
-			if row == pd.FistRow {
-				destRow := destRow + pd.Increment
-				if p.IsEmptyCell(col, destRow) {
-					ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col})
+			if destRow == pd.PromotionRow {
+				piecesToCast := []int{common.PieceKnight, common.PieceBishop, common.PieceRook, common.PieceQueen}
+				for _, pieceToCast := range piecesToCast {
+					ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col, CastTo: pieceToCast})
+				}
+			} else {
+				ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col})
+				if row == pd.FistRow {
+					destRow := destRow + pd.Increment
+					if p.IsEmptyCell(col, destRow) {
+						ms = appendMoveIfValid(p, ms, Move{SourceRow: row, SourceColumn: col, DestRow: destRow, DestColumn: col})
+					}
 				}
 			}
 		}

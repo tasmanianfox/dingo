@@ -62,6 +62,7 @@ func TestFindPawnPieceMoves(t *testing.T) {
 		testData{Fen: "rnbqkbnr/ppp1pppp/8/4P3/2Pp4/8/PP1P1PPP/RNBQKBNR b KQkq c3 0 1", Column: common.ColumnD, Row: common.Row4, Moves: 2},
 		testData{Fen: "rnbqkbnr/pp2p1pp/4P3/3p1p2/5P2/2p5/PPPP2PP/RNBQKBNR w KQkq - 0 1", Column: common.ColumnE, Row: common.Row6, Moves: 0},
 		testData{Fen: "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 1", Column: common.ColumnE, Row: common.Row5, Moves: 2},
+		testData{Fen: "8/5k1K/8/8/8/8/5p2/8 b - - 0 1", Column: common.ColumnF, Row: common.Row2, Moves: 4},
 	}
 
 	for i, pd := range pds {
