@@ -61,11 +61,11 @@ func CommitMove(p Position, m Move) Position {
 	}
 
 	// En passant
-	if p.EnPassantTargetColumn == m.DestColumn && common.ColourWhite == pc.Colour && p.EnPassantTargetRow == m.DestRow-1 {
+	if common.PiecePawn == pc.Type && p.EnPassantTargetColumn == m.DestColumn && common.ColourWhite == pc.Colour && p.EnPassantTargetRow == m.DestRow-1 {
 		p.Board[m.DestRow-1][m.DestColumn] = GetEmptyCell()
 		isPieceCaptured = true
 	}
-	if p.EnPassantTargetColumn == m.DestColumn && common.ColourBlack == pc.Colour && p.EnPassantTargetRow == m.DestRow+1 {
+	if common.PiecePawn == pc.Type && p.EnPassantTargetColumn == m.DestColumn && common.ColourBlack == pc.Colour && p.EnPassantTargetRow == m.DestRow+1 {
 		p.Board[m.DestRow+1][m.DestColumn] = GetEmptyCell()
 		isPieceCaptured = true
 	}
@@ -79,21 +79,29 @@ func CommitMove(p Position, m Move) Position {
 	}
 
 	// Disable castling
-	if common.Row1 == m.DestRow {
-		if true == p.WhiteKingsideCastling && (common.ColumnH == m.SourceColumn || common.ColumnH == m.DestColumn || common.ColumnE == m.SourceColumn) {
-			p.WhiteKingsideCastling = false
-		}
-		if true == p.WhiteQueensideCastling && (common.ColumnA == m.SourceColumn || common.ColumnA == m.DestColumn || common.ColumnE == m.SourceColumn) {
-			p.WhiteQueensideCastling = false
-		}
+	if true == p.WhiteKingsideCastling &&
+		((common.ColumnH == m.DestColumn && common.Row1 == m.DestRow) ||
+			(common.ColumnH == m.SourceColumn && common.Row1 == m.SourceRow) ||
+			(common.ColumnE == m.SourceColumn && common.Row1 == m.SourceRow)) {
+		p.WhiteKingsideCastling = false
 	}
-	if common.Row8 == m.DestRow {
-		if true == p.BlackKingsideCastling && (common.ColumnH == m.SourceColumn || common.ColumnH == m.DestColumn || common.ColumnE == m.SourceColumn) {
-			p.BlackKingsideCastling = false
-		}
-		if true == p.BlackQueensideCastling && (common.ColumnA == m.SourceColumn || common.ColumnA == m.DestColumn || common.ColumnE == m.SourceColumn) {
-			p.BlackQueensideCastling = false
-		}
+	if true == p.WhiteQueensideCastling &&
+		((common.ColumnA == m.DestColumn && common.Row1 == m.DestRow) ||
+			(common.ColumnA == m.SourceColumn && common.Row1 == m.SourceRow) ||
+			(common.ColumnE == m.SourceColumn && common.Row1 == m.SourceRow)) {
+		p.WhiteQueensideCastling = false
+	}
+	if true == p.BlackKingsideCastling &&
+		((common.ColumnH == m.DestColumn && common.Row8 == m.DestRow) ||
+			(common.ColumnH == m.SourceColumn && common.Row8 == m.SourceRow) ||
+			(common.ColumnE == m.SourceColumn && common.Row8 == m.SourceRow)) {
+		p.BlackKingsideCastling = false
+	}
+	if true == p.BlackQueensideCastling &&
+		((common.ColumnA == m.DestColumn && common.Row8 == m.DestRow) ||
+			(common.ColumnA == m.SourceColumn && common.Row8 == m.SourceRow) ||
+			(common.ColumnE == m.SourceColumn && common.Row8 == m.SourceRow)) {
+		p.BlackQueensideCastling = false
 	}
 
 	// Assign the en passant target

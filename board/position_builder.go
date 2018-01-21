@@ -32,6 +32,10 @@ func BuildStartPosition() Position {
 	p.FullMoveClock = 1
 	p.FiftyMoveClock = 0
 	p.ActiveColour = common.ColourWhite
+	p.WhiteKingsideCastling = true
+	p.WhiteQueensideCastling = true
+	p.BlackKingsideCastling = true
+	p.BlackQueensideCastling = true
 
 	return p
 }
