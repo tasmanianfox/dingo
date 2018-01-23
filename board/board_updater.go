@@ -105,8 +105,9 @@ func CommitMove(p Position, m Move) Position {
 	}
 
 	// Assign the en passant target
-	if (common.ColourWhite == colour && common.Row2 == m.SourceRow && common.Row4 == m.DestRow) ||
-		common.ColourBlack == colour && common.Row7 == m.SourceRow && common.Row5 == m.DestRow {
+	if common.PiecePawn == pc.Type &&
+		((common.ColourWhite == colour && common.Row2 == m.SourceRow && common.Row4 == m.DestRow) ||
+			(common.ColourBlack == colour && common.Row7 == m.SourceRow && common.Row5 == m.DestRow)) {
 		p.EnPassantTargetColumn = m.DestColumn
 		p.EnPassantTargetRow = m.DestRow
 	} else {

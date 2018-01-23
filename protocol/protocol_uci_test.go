@@ -75,6 +75,10 @@ func TestReadCommand(t *testing.T) {
 			"position startpos moves e2e4 b8c6 h2h4 c6b4 e1e2 b4c2 a2a3 c2a3 d2d4 e7e6 b1d2 a3b1 a1a6 g7g6 h1h3 g8h6 d1a4 d8g5 a6a5 c7c5 a4c6 f8g7",
 			"r1b1k2r/pp1p1pbp/2Q1p1pn/R1p3q1/3PP2P/7R/1P1NKPP1/1nB2BN1 w kq - 2 12",
 		},
+		{
+			"position startpos moves g2g4 b8a6 c2c4 c7c5 d1c2 e7e6 c2c3 f7f5 c3e5 f5f4 f1g2 g8h6 g2f1 f4f3 e5c7 d7d5 c7g3 e8e7 g3e5 d8d6 e5c3 e6e5 h2h4 b7b5 d2d4 d6f6 f1g2 e5d4 c3c2 f6h4 c1h6 h4h3 c2c1 h3g3 c1c3 a6c7 e2f3 c7e6 g2f1 e7f7 h1h3 g3d6 c3e3 d6a6 e3e5 a6a4 f1e2 a4c2 e5e6 f7e6 a2a4 c2d3 c4b5 d3b5 b1d2 c5c4 e1c1 g7g6 b2b3 c8b7 e2d3 f8b4 d3g6 b5b6 c1c2 b4c3 h3g3 b6c6 b3c4 c6d6 g3h3 d6f8 c2b3 e6e7 g6f7 f8c8 d1e1",
+			"r1q4r/pb2kB1p/7B/3p4/P1Pp2P1/1Kb2P1R/3N1P2/4R1N1 b - - 8 39",
+		},
 	}
 	for i, pData := range positions {
 		pos := pData[0]

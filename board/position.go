@@ -65,6 +65,22 @@ func (p Position) IsKingChecked(c int) bool {
 	return result
 }
 
+// IsKingChecked returns true if player's c king is checkmnated at position p
+func (p Position) IsKingCheckmated(c int) bool {
+	p2 := p
+	p2.ActiveColour = c
+	result := false
+	cf := p.IsKingChecked(c)
+	if cf {
+		ms := FindAllAvailableMoves(p2)
+		if 0 == len(ms) {
+			result = true
+		}
+	}
+
+	return result
+}
+
 // GetEmptyCell returns an "empty" piece which indicates that the cell is empty
 func GetEmptyCell() Piece {
 	return Piece{Colour: common.ColourEmpty, Type: common.PieceEmpty}

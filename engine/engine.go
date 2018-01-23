@@ -10,6 +10,14 @@ import (
 	"github.com/tasmanianfox/dingo/response"
 )
 
+const (
+	MaterialIncrementPawn   = 100
+	MaterialIncrementKnight = 300
+	MaterialIncrementBishop = 300
+	MaterialIncrementRook   = 500
+	MaterialIncrementQueen  = 900
+)
+
 type Engine struct {
 	Position        board.Position
 	ResponseChannel chan response.Response
@@ -47,7 +55,7 @@ func (e Engine) calculateMove(c command.CalculateMoveCommand) {
 	p := e.Position
 	for _, m := range ms {
 		p2 := board.CommitMove(p, m)
-		s := e.evaluate(p2, p.ActiveColour, 2)
+		s := e.evaluate(p2, p.ActiveColour, 3)
 		if s > bs {
 			bms = []board.Move{}
 			bs = s
@@ -73,23 +81,61 @@ func (e Engine) calculateMove(c command.CalculateMoveCommand) {
 
 func (e Engine) evaluate(pos board.Position, colour int, depth int) int {
 	r := common.MinusInf
-	if 0 == depth {
-		r = 0
+
+	points := 0
+	if pos.IsKingCheckmated(pos.ActiveColour) {
+		if pos.ActiveColour == colour {
+			points = common.MinusInf
+		} else {
+			points = common.PlusInf
+		}
+		r = points
+	} else if 0 == depth {
+		wp, bp := 0, 0
+		for _, cells := range pos.Board {
+			for _, cell := range cells {
+				inc := 0
+				switch cell.Type {
+				case common.PiecePawn:
+					inc = MaterialIncrementPawn
+				case common.PieceKnight:
+					inc = MaterialIncrementKnight
+				case common.PieceBishop:
+					inc = MaterialIncrementBishop
+				case common.PieceRook:
+					inc = MaterialIncrementRook
+				case common.PieceQueen:
+					inc = MaterialIncrementQueen
+				}
+				switch cell.Colour {
+				case common.ColourWhite:
+					wp += inc
+				case common.ColourBlack:
+					bp += inc
+				}
+			}
+		}
+		diff := wp - bp
+		if common.ColourBlack == colour {
+			diff = diff * -1
+		}
+		r = diff
 	} else {
 		ms := board.FindAllAvailableMoves(pos)
-		bms := []board.Move{}
-		bs := common.MinusInf
+		areOwnMovesEvaluated := pos.ActiveColour == colour
+		bs := 0
+		if areOwnMovesEvaluated {
+			bs = common.MinusInf
+		} else {
+			bs = common.PlusInf
+		}
 
-		p := e.Position
 		for _, m := range ms {
-			p2 := board.CommitMove(p, m)
+			p2 := board.CommitMove(pos, m)
 			s := e.evaluate(p2, colour, depth-1)
-			if s > bs {
-				bms = []board.Move{}
+
+			if (areOwnMovesEvaluated && s > bs) || (!areOwnMovesEvaluated && s < bs) {
 				bs = s
-			}
-			if s >= bs {
-				bms = append(bms, m)
 			}
 		}
 		r = bs
